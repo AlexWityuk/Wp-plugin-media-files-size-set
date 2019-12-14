@@ -56,8 +56,22 @@ class Setimagesize {
 		<?php
 		for ($i=0; $i < (int)$num_images['input'] ; $i++) { 
 			$attach_id = get_post_meta( $post->ID, 'post-id-img-src'.$i, true );
+			$addition_attr = get_post_meta( $post->ID, 'post-img-additional-attr'.$i, true );
+			$attr_arr = explode(';', $addition_attr);
+			$arg_arr = array();
+			foreach ($attr_arr as $value) {
+				$val = explode(':', $value);
+				$arg_arr[$val[0]] = $val[1];
+			}
+
 			?>
 			<div style="margin-bottom: 15px;">
+				<p>
+					<label for="<?php echo $post->ID.'%'.$i; ?>-additionl-img-attr">Additional img attributes</label>
+		            <input type="text" id="<?php echo $post->ID.'%'.$i; ?>-additionl-img-attr"*
+		            name="<?php echo $post->ID.'%'.$i; ?>-additionl-img-attr" 
+		            value="<?php echo $addition_attr; ?>"  pattern="(([0-9a-z]*)(:)([0-9a-z]*))*(;)*(([0-9a-z]*)(:)([0-9a-z]*))*" />                            
+		        </p>
 				<input type="hidden" name="<?php echo $post->ID.'%'.$i; ?>-image-url" value="<?php echo $attach_id; ?>" >
 				<div value=""  class="regular-text process_custom_images" id="process_custom_images" 
 				style="overflow: hidden;
@@ -68,7 +82,7 @@ class Setimagesize {
 			<?php
 			if (isset($attach_id)) {
 
-				echo wp_get_attachment_image( $attach_id, Array($img_size[0], $img_size[1]) );
+				echo wp_get_attachment_image( $attach_id, Array($img_size[0], $img_size[1]), false, $arg_arr );
 			}
 			?>
 			</div>
@@ -92,6 +106,10 @@ class Setimagesize {
 	    	$query_post = $post_id.'%'.$i.'-image-url';
 		    if ( ! empty( $_POST[$query_post] ) ) {
 		        update_post_meta( $post_id, 'post-id-img-src'.$i, $_POST[$query_post] );
+		    }
+	    	$add_attr = $post_id.'%'.$i.'-additionl-img-attr';
+		    if ( ! empty( $_POST[$add_attr] ) ) {
+		        update_post_meta( $post_id, 'post-img-additional-attr'.$i, trim($_POST[$add_attr]) );
 		    }
 	    }
 	}
